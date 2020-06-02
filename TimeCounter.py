@@ -62,7 +62,7 @@ def print_time_tracking(time_tracking):
 time_tracking_pattern = re.compile('added (\d+)([h|m])( (\d+)m)?')
 
 gl = gitlab.Gitlab(config['AUTHENTICATION']['GitLabServer'],
-                   private_token=config['AUTHENTICATION']['PrivateAccessToken'])
+                   private_token=config['AUTHENTICATION']['PersonalAccessToken'])
 
 project = gl.projects.get(config['PROJECT']['ID'])
 
