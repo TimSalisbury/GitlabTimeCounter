@@ -82,7 +82,7 @@ def print_time_tracking_per_sprint(per_sprint_time_tracking):
     for sprint, time in per_sprint_time_tracking.items():
         if len(time) == 0:
             continue
-        print("###" + sprint.title)
+        print("### " + sprint.title)
         print("| User | Time Spent  |")
         print("|-----|---|")
         for key, value in time.items():
@@ -111,7 +111,7 @@ def get_sprint_from_date(date):
         end_date = (int(end_date[1]), int(end_date[2]))
 
         # https://stackoverflow.com/questions/5464410/how-to-tell-if-a-date-is-between-two-other-dates-in-python/5464467
-        if start_date <= date <= end_date:
+        if start_date <= date < end_date:
             return sprint
 
     return None
@@ -172,7 +172,7 @@ sprints = list(filter(lambda milestone: config['PROJECT']['SprintMilestonePrefix
 for sprint in sprints:
     process_sprint(sprint, per_sprint_time_tracking, over_all_time_tracking)
 
-if config['PROJECT']['LabTimeWikiSlug'] is not None:
+if 'LabTimeWikiSlug' in config['PROJECT']:
     process_lab_session_times(project.wikis.get(config['PROJECT']['LabTimeWikiSlug']), per_sprint_time_tracking,
                               over_all_time_tracking)
 
