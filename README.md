@@ -20,6 +20,8 @@ required values for authentication with your given GitLab server. These are:
 * `ID` e.g. `123` This is the ID of your project
 * `SprintMilestonePrefix` e.g. `Sprint` This is prefix to all Sprint milestones, for example, if your 
 sprint Milestones were named: `Sprint 1`, `Sprint 2`, `Sprint 3` then your prefix would be `Sprint`
+* OPTIONAL: `Lab-time-log` e.g. `Lab-time-log`, this is used if you wish to include your meeting time in the breakdown.
+Note that your meeting tables have to follow a quite specific format for this to work properly. 
 
 Here is an example `config.ini`:
 ```ini
@@ -30,4 +32,5 @@ PersonalAccessToken = ABCDEFGHI12345
 [PROJECT]
 ID = 123
 SprintMilestonePrefix = Sprint
+LabTimeWikiSlug = Lab-time-log
 ```
