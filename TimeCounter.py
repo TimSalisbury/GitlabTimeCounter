@@ -62,7 +62,7 @@ def process_note(note, per_sprint_time_tracking):
     Processes a note
     """
     captures = re.search(time_tracking_pattern, note['body'])
-    user = note['author']['name']
+    user = note['author']['name'].split(' ')[-1]
     # Check that user exists in the dictionary, if not then add them
     if user not in per_sprint_time_tracking:
         per_sprint_time_tracking[user] = 0
@@ -137,10 +137,8 @@ def process_table(table, sprint_time_tracking, overall_time_tracking):
             end_time = get_time_from_string(row[8])
             # Get total time spent, turn into seconds
             minutes_spent = (end_time - start_time).seconds / 60
-            # Add time onto the tracking maps
-            for key, value in overall_time_tracking.items():
-                if row[3] in key.split(' ')[1]:
-                    add_entry(key, minutes_spent, overall_time_tracking, sprint_time_tracking[sprint])
+            # Add time onto the tracking maps - row[3] is lastname
+            add_entry(row[3], minutes_spent, overall_time_tracking, sprint_time_tracking[sprint])
 
 
 def add_entry(key, value, overall_time_tracking, per_sprint_time_tracking):
