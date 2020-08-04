@@ -43,38 +43,49 @@ def process_issue(issue, per_sprint_time_tracking):
     """
     Processes an issue
     """
+    per_discussion_time_tracking = {}
     discussions = issue.discussions.list(all=True)
     for discussion in discussions:
-        process_discussion(discussion, per_sprint_time_tracking)
+        process_discussion(discussion, per_discussion_time_tracking)
+    for key, value in per_discussion_time_tracking.items():
+        if key not in per_sprint_time_tracking:
+            per_sprint_time_tracking[key] = 0
+        per_sprint_time_tracking[key] += value
 
 
 def process_discussion(discussion, per_sprint_time_tracking):
     """
     Processes a discussion, filters out everything except for time added notes.
     """
-    notes = list(filter(lambda _note: time_tracking_pattern.match(_note['body']), discussion.attributes['notes']))
+    notes = list(filter(lambda _note: time_tracking_pattern.match(_note['body']) or
+                                      time_removing_pattern.match(_note['body']), discussion.attributes['notes']))
     for note in notes:
         process_note(note, per_sprint_time_tracking)
+
 
 
 def process_note(note, per_sprint_time_tracking):
     """
     Processes a note
     """
-    captures = re.search(time_tracking_pattern, note['body'])
     user = note['author']['name'].split(' ')[-1]
-    # Check that user exists in the dictionary, if not then add them
-    if user not in per_sprint_time_tracking:
-        per_sprint_time_tracking[user] = 0
-
-    # Calculate amount of time added
-    if 'm' in captures.group(2):
-        per_sprint_time_tracking[user] += int(captures.group(1))
+    if time_removing_pattern.match(note['body']):
+        if user in per_sprint_time_tracking:
+            per_sprint_time_tracking[user] = 0
     else:
-        per_sprint_time_tracking[user] += int(captures.group(1)) * 60
+        captures = re.search(time_tracking_pattern, note['body'])
+        # Check that user exists in the dictionary, if not then add them
+        if user not in per_sprint_time_tracking:
+            per_sprint_time_tracking[user] = 0
 
-    if captures.group(4) is not None:
-        per_sprint_time_tracking[user] += int(captures.group(4))
+        # Calculate amount of time added
+        if 'm' in captures.group(2):
+            per_sprint_time_tracking[user] += int(captures.group(1))
+        else:
+            per_sprint_time_tracking[user] += int(captures.group(1)) * 60
+
+        if captures.group(4) is not None:
+            per_sprint_time_tracking[user] += int(captures.group(4))
 
 
 def print_time_tracking_per_sprint(per_sprint_time_tracking):
@@ -151,6 +162,7 @@ def add_entry(key, value, overall_time_tracking, per_sprint_time_tracking):
 
 
 time_tracking_pattern = re.compile('added (\d+)([h|m])( (\d+)m)?')
+time_removing_pattern = re.compile('removed time spent')
 group_lab_time_table_pattern = re.compile('#{4} Group Lab Session \d+(?:.+)?(?:\n\|(?:[^|]+\|){5})+')
 table_row_pattern = re.compile(
     '\|\s+(\d+\/\d+\/\d+)\s+\|\s*\w+\s*\|\s*((\w+) (\w+))\s*\|\s*((\d+(.\d+)?)(pm|am))\s*\|\s*((\d+(.\d+)?)(pm|am))\s*\|')
